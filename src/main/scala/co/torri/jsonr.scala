@@ -21,6 +21,4 @@ package object jsonr {
 
     def $(all: (String, Any)*) = new JSONBlock(List(all: _*))
     def %(all: Any*) = new JSONArray(List(all: _*))
-
-    def hello = "hello"
 }
