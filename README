@@ -1,0 +1,19 @@
+A very simple library to create JSON strings in Scala:
+
+var json = $(
+  "key"   -> "value",
+  "other" -> 2,
+  "array" -> %(1,2,3,4,5),
+  "more"  -> %(
+    $(
+      "foo" -> "bar"
+    ),
+    $(
+      "bar" -> "baz"
+    )
+  ),
+  "good"  -> "bye"
+)
+
+println(json)
+// {"key": "value", "other": 2, "array": [1, 2, 3, 4, 5], "more": [{"foo": "bar"}, {"bar": "baz"}], "good": "bye"}
