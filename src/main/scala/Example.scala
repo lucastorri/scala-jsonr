@@ -15,7 +15,9 @@ object Example {
               "bar" -> "baz"
             )
           ),
-          "good"  -> "bye"
+          "good"  -> "bye",
+          "bool"  -> true,
+          "doubl" -> 5.67
         )
         
         println(json)
