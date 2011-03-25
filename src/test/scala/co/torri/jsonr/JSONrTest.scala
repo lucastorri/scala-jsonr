@@ -88,4 +88,9 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         json should be === """{"arg1": {"param1": "a", "param2": 1}, "arg2": 2}"""
     }
     
+    it should "allow nested null objects in toJSON" in {
+        val json = new SomethingElse(null, 2).toJSON.toString
+        json should be === """{"arg1": "null", "arg2": 2}"""
+    }
+    
 }

@@ -1,7 +1,5 @@
 package co.torri
 
-import sbt.ReflectUtilities
-
 package object jsonr {
     
     private def jsonize(a: Any): String = a match {
