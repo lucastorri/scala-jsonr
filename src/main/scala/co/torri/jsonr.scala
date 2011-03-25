@@ -10,9 +10,9 @@ package object jsonr {
 
     class JSONBlock(inner: List[(String, Any)]) {
         override def toString = {
-            "{" + inner.map { t =>
-                val value = jsonize(t._2)
-                format(""""%s": %s""", t._1, value)
+            "{" + inner.map { case (k,v) =>
+                val value = jsonize(v)
+                format(""""%s": %s""", k, value)
             }.mkString(", ") + "}"
         }
     }
