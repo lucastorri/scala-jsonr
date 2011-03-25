@@ -17,3 +17,14 @@ var json = $(
 
 println(json)
 // {"key": "value", "other": 2, "array": [1, 2, 3, 4, 5], "more": [{"foo": "bar"}, {"bar": "baz"}], "good": "bye"}
+
+
+
+or like this:
+
+class Something(val param1: String, val param2: Int)
+class SomethingElse(val arg1: Something, val arg2: Int)
+
+val json = new SomethingElse(new Something("a", 1), 2).toJSON
+println(json)
+// {"arg1": {"param1": "a", "param2": 1}, "arg2": 2}
