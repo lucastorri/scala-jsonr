@@ -22,7 +22,22 @@ object Example {
         )
         
         println(json)
-      
+        
+        
+        case class Person(firstname: String, lastname: String)
+        val people = List(Person("Lucas", "Torri"), Person("Guilherme", "Tramontina"))
+
+        val other = $(
+          "people" -> {
+            for (p <- people) yield $(
+              "firstname" -> p.firstname,
+              "lastname" -> p.lastname
+            )
+          }
+        )
+        
+        println(other)
+        
     }
 }
 
