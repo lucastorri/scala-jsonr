@@ -67,4 +67,12 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         json should be === """{"people": [{"fn": "A", "ln": "B"}, {"fn": "C", "ln": "D"}]}"""
     }
     
+    it should "allow the use of a Iterable instead of %(...)" in {
+        val json = $(
+            "list" -> List(1,2,3)
+        ).toString
+        
+        json should be === """{"list": [1, 2, 3]}"""
+    }
+    
 }
