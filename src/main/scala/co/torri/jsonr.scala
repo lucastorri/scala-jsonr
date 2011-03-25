@@ -4,7 +4,7 @@ package object jsonr {
     
     private def jsonize(a: Any): String = a match {
         case s: String => format(""" "%s" """, s).trim //trim: just because it breaks the TextMate color theme
-        case l: List[_] => new JSONArray(l).toString
+        case i: Iterable[_] => new JSONArray(i.toList).toString
         case a => a.toString
     }
 
