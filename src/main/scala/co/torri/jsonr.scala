@@ -11,8 +11,7 @@ package object jsonr {
     class JSONBlock(inner: List[(String, Any)]) {
         override def toString = {
             "{" + inner.map { case (k,v) =>
-                val value = jsonize(v)
-                format(""""%s": %s""", k, value)
+                format(""""%s": %s""", k, jsonize(v))
             }.mkString(", ") + "}"
         }
     }
