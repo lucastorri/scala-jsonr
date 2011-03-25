@@ -75,4 +75,17 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         json should be === """{"list": [1, 2, 3]}"""
     }
     
+    class Something(val param1: String, val param2: Int)
+    class SomethingElse(val arg1: Something, val arg2: Int)
+    
+    it should "enable any class to call the toJSON method" in {
+        val json = new Something("hello", 7).toJSON.toString
+        json should be === """{"param1": "hello", "param2": 7}"""
+    }
+    
+    it should "allow nested objects in toJSON calls" in {
+        val json = new SomethingElse(new Something("a", 1), 2).toJSON.toString
+        json should be === """{"arg1": {"param1": "a", "param2": 1}, "arg2": 2}"""
+    }
+    
 }
