@@ -77,6 +77,7 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         json should be === """{"list": [1, 2, 3]}"""
     }
     
+    class Someone(val name: String)
     class Something(val param1: String, val param2: Int)
     class SomethingElse(val arg1: Something, val arg2: Int)
     
@@ -93,6 +94,14 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
     it should "allow nested null objects in toJSON" in {
         val json = new SomethingElse(null, 2).toJSON.toString
         json should be === """{"arg1": "null", "arg2": 2}"""
+    }
+    
+    it should "create groups for lists of classes other than basic types" in {
+        val json = $(
+            "objs" -> List(new Someone("Lucas"), new Someone("Isa"))
+        ).toString
+        
+        json should be === """{"objs": [{"name": "Lucas"}, {"name": "Isa"}]}"""
     }
     
 }

@@ -2,13 +2,38 @@ package co.torri
 
 package object jsonr {
     
+    private def isABasicScalaType(a: AnyRef) = {
+        a == null                 ||
+        a.isInstanceOf[Unit]      ||
+        a.isInstanceOf[String]    ||
+        a.isInstanceOf[Symbol]    ||
+        a.isInstanceOf[Char]      ||
+        a.isInstanceOf[Byte]      ||
+        a.isInstanceOf[Short]     ||
+        a.isInstanceOf[Int]       ||
+        a.isInstanceOf[Long]      ||
+        a.isInstanceOf[Float]     ||
+        a.isInstanceOf[Double]    ||
+        a.isInstanceOf[Boolean]
+    }
+    
+    object IsABasicScalaType {
+        def unapply(a: AnyRef) = {
+            if (isABasicScalaType(a)) Some(a)
+            else None
+        }
+    }
+    
     private def jsonize(a: Any): String = a match {
-        case s: String      => format("\"%s\"", s)
-        case s: Symbol      => format("\"%s\"", s.toString)
-        case u: Unit        => ""
-        case i: Iterable[_] => new JSONArray(i.toList).toString
-        case null           => "\"null\""
-        case _              => a.toString
+        case s: String            => format("\"%s\"", s)
+        case s: Symbol            => format("\"%s\"", s.toString)
+        case u: Unit              => ""
+        case i: Iterable[_]       => new JSONArray(i.toList).toString
+        case null                 => "\"null\""
+        case IsABasicScalaType(a) => a.toString
+        case b: JSONBlock         => b.toString
+        case a: JSONArray         => a.toString
+        case _                    => a.toJSON.toString
     }
 
     trait JSONBlock
@@ -35,19 +60,7 @@ package object jsonr {
     class JSONable(a: AnyRef) {
         
         def toJSON: JSONBlock = {
-            if (a == null                 ||
-                a.isInstanceOf[Unit]      ||
-                a.isInstanceOf[String]    ||
-                a.isInstanceOf[Symbol]    ||
-                a.isInstanceOf[Char]      ||
-                a.isInstanceOf[Byte]      ||
-                a.isInstanceOf[Short]     ||
-                a.isInstanceOf[Int]       ||
-                a.isInstanceOf[Long]      ||
-                a.isInstanceOf[Float]     ||
-                a.isInstanceOf[Double]    ||
-                a.isInstanceOf[Boolean]   ||
-                a.isInstanceOf[JSONArray]) new FakeJSONBlock(a)
+            if (isABasicScalaType(a) || a.isInstanceOf[JSONArray]) new FakeJSONBlock(a)
             else classJSON
         }
         
