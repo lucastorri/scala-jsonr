@@ -77,28 +77,28 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         json should be === """{"list": [1, 2, 3]}"""
     }
     
-    class Someone(val name: String)
-    class Something(val param1: String, val param2: Int)
-    class SomethingElse(val arg1: Something, val arg2: Int)
+    case class Someone(val name: String)
+    case class Something(val param1: String, val param2: Int)
+    case class SomethingElse(val arg1: Something, val arg2: Int)
     
     it should "enable any class to call the toJSON method" in {
-        val json = new Something("hello", 7).toJSON.toString
+        val json = Something("hello", 7).toJSON.toString
         json should be === """{"param1": "hello", "param2": 7}"""
     }
     
     it should "allow nested objects in toJSON calls" in {
-        val json = new SomethingElse(new Something("a", 1), 2).toJSON.toString
+        val json = SomethingElse(Something("a", 1), 2).toJSON.toString
         json should be === """{"arg1": {"param1": "a", "param2": 1}, "arg2": 2}"""
     }
     
     it should "allow nested null objects in toJSON" in {
-        val json = new SomethingElse(null, 2).toJSON.toString
+        val json = SomethingElse(null, 2).toJSON.toString
         json should be === """{"arg1": "null", "arg2": 2}"""
     }
     
     it should "create groups for lists of classes other than basic types" in {
         val json = $(
-            "objs" -> List(new Someone("Lucas"), new Someone("Isa"))
+            "objs" -> List(Someone("Lucas"), Someone("Isa"))
         ).toString
         
         json should be === """{"objs": [{"name": "Lucas"}, {"name": "Isa"}]}"""
