@@ -55,8 +55,8 @@ package object jsonr {
             val c = a.getClass
             val fields = c.getDeclaredFields.filterNot(_.getName.contains("$")).toList
             new RealJSONBlock(fields.filter(f => c.getDeclaredMethod(f.getName) != null).map{ f => 
-                (f.getName, c.getDeclaredMethod(f.getName).invoke(a))
-            }.map{case (n,v) => (n,v.toJSON)})
+                (f.getName, c.getDeclaredMethod(f.getName).invoke(a).toJSON)
+            })
         }
     }
     

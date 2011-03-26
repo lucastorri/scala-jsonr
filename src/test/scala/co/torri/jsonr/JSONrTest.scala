@@ -5,8 +5,10 @@ import org.scalatest.matchers.ShouldMatchers
 import co.torri.jsonr._
 
 class JSONrTest extends FlatSpec with ShouldMatchers {
+    
+    behavior of "JSONr"
 
-    "JSONr" should "create a JSON String from Strings" in {
+    it should "create a JSON String from Strings" in {
         val json = $(
             "key" -> "value"
         ).toString
