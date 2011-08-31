@@ -103,5 +103,12 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
         
         json should be === """{"objs": [{"name": "Lucas"}, {"name": "Isa"}]}"""
     }
-    
+
+    case class ObjWithList(val i: Int, val l: List[Int])
+
+    it should "handle Iterable objects inside other objects" in {
+      val json = ObjWithList(3, List(1,2,3)).toJSON.toString
+
+      json should be === """{"i": 3, "l": [1, 2, 3]}"""
+    }
 }

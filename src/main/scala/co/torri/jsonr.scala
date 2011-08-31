@@ -32,8 +32,7 @@ package object jsonr {
         case null                 => "\"null\""
         case IsABasicScalaType(a) => a.toString
         case b: JSONBlock         => b.toString
-        case a: JSONArray         => a.toString
-        case _                    => a.toJSON.toString
+        case _                    => any2jsonable(a).toJSON.toString
     }
 
     trait JSONBlock
@@ -43,11 +42,12 @@ package object jsonr {
     class RealJSONBlock(inner: List[(String, Any)]) extends JSONBlock {
         override def toString = {
             "{" + inner.map { case (k,v) =>
+              if (k == "l") println("v: " + v.asInstanceOf[AnyRef].getClass)
                 format(""""%s": %s""", k, jsonize(v))
             }.mkString(", ") + "}"
         }
     }
-    class JSONArray(el: List[Any]) {
+    class JSONArray(el: List[Any]) extends JSONBlock {
         override def toString = {
             "[" + el.map(jsonize).mkString(", ") + "]"
         }
@@ -60,16 +60,29 @@ package object jsonr {
     class JSONable(a: AnyRef) {
         
         def toJSON: JSONBlock = {
-            if (isABasicScalaType(a) || a.isInstanceOf[JSONArray]) new FakeJSONBlock(a)
+            if (isABasicScalaType(a)) new FakeJSONBlock(a)
+            else if (a.isInstanceOf[Iterable[_]]) new JSONArray(a.asInstanceOf[Iterable[_]].toList)
             else classJSON
         }
         
         private def classJSON: JSONBlock = {
             val c = a.getClass
             val fields = c.getDeclaredFields.filterNot(_.getName.contains("$")).toList
-            new RealJSONBlock(fields.filter(f => c.getDeclaredMethod(f.getName) != null).map{ f => 
-                (f.getName, c.getDeclaredMethod(f.getName).invoke(a).toJSON)
-            })
+            new RealJSONBlock(
+              fields.filter{f => 
+                try {
+                  c.getDeclaredMethod(f.getName) != null
+                } catch {
+                  case _ => false
+                }
+              }.
+              map{ f =>
+                if (f.getName == "l") {
+                  println(any2jsonable(c.getDeclaredMethod(f.getName).invoke(a)).toJSON.toString)
+                }
+                (f.getName, any2jsonable(c.getDeclaredMethod(f.getName).invoke(a)).toJSON)
+              }
+            )
         }
     }
     
