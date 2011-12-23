@@ -26,7 +26,7 @@ package object jsonr {
     
     private def jsonize(a: Any): String = a match {
 		case None				  => "\"\""
-		case s: Some[_]           => any2jsonable(s).toJSON.toString
+		case s: Some[_]           => any2jsonable(s.get).toJSON.toString
         case s: String            => format("\"%s\"", s)
         case s: Symbol            => format("\"%s\"", s.toString)
         case u: Unit              => ""
@@ -44,7 +44,6 @@ package object jsonr {
     class RealJSONBlock(inner: List[(String, Any)]) extends JSONBlock {
         override def toString = {
             "{" + inner.map { case (k,v) =>
-              if (k == "l") println("v: " + v.asInstanceOf[AnyRef].getClass)
                 format(""""%s": %s""", k, jsonize(v))
             }.mkString(", ") + "}"
         }
@@ -79,9 +78,6 @@ package object jsonr {
                 }
               }.
               map{ f =>
-                if (f.getName == "l") {
-                  println(any2jsonable(c.getDeclaredMethod(f.getName).invoke(a)).toJSON.toString)
-                }
                 (f.getName, any2jsonable(c.getDeclaredMethod(f.getName).invoke(a)).toJSON)
               }
             )

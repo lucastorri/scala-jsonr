@@ -122,7 +122,7 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 	
 	it should "convert the content of 'Some'" in {
 		val json = $(
-            "some" -> 1
+            "some" -> Some(1)
         ).toString
 		
 		json should be === """{"some": 1}"""
