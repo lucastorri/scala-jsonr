@@ -111,4 +111,20 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 
       json should be === """{"i": 3, "l": [1, 2, 3]}"""
     }
+	
+	it should "convert 'None' to empty string" in {
+		val json = $(
+            "none" -> None
+        ).toString
+		
+		json should be === """{"none": ""}"""
+	}
+	
+	it should "convert the content of 'Some'" in {
+		val json = $(
+            "some" -> 1
+        ).toString
+		
+		json should be === """{"some": 1}"""
+	}
 }

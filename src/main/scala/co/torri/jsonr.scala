@@ -25,6 +25,8 @@ package object jsonr {
     }
     
     private def jsonize(a: Any): String = a match {
+		case None				  => "\"\""
+		case s: Some[_]           => any2jsonable(s).toJSON.toString
         case s: String            => format("\"%s\"", s)
         case s: Symbol            => format("\"%s\"", s.toString)
         case u: Unit              => ""
