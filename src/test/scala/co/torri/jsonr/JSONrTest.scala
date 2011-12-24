@@ -127,4 +127,25 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 		
 		json should be === """{"some": 1}"""
 	}
+	
+	it should "convert maps to objects" in {
+		val json = Map("one" -> 1, "two" -> 2).toJSON.toString
+		
+		json should be === """{"one": 1, "two": 2}"""
+	}
+	
+	it should "convert other type of maps to objects" in {
+		val json = scala.collection.mutable.HashMap("two" -> 2).toJSON.toString
+		
+		json should be === """{"two": 2}"""
+	}
+	
+	case class ObjWithMap(theMap: Map[String, String])
+	
+	it should "convert inner maps to objects" in {
+		val json = ObjWithMap(Map("a" -> "b")).toJSON.toString
+		
+		json should be === """{"theMap": {"a": "b"}}"""
+	}
+	
 }

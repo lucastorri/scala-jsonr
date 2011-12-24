@@ -27,9 +27,10 @@ package object jsonr {
     private def jsonize(a: Any): String = a match {
 		case None				  => "\"\""
 		case s: Some[_]           => any2jsonable(s.get).toJSON.toString
-        case s: String            => format("\"%s\"", s)
-        case s: Symbol            => format("\"%s\"", s.toString)
-        case u: Unit              => ""
+        case s: String            			=> format("\"%s\"", s)
+        case s: Symbol            			=> format("\"%s\"", s.toString)
+        case u: Unit              			=> ""
+		case m: scala.collection.Map[_, _]	=> new JSONMap(m).toString
         case i: Iterable[_]       => new JSONArray(i.toList).toString
         case null                 => "\"null\""
         case IsABasicScalaType(a) => a.toString
@@ -53,6 +54,11 @@ package object jsonr {
             "[" + el.map(jsonize).mkString(", ") + "]"
         }
     }
+	class JSONMap(m: scala.collection.Map[_,_]) extends JSONBlock {
+		override def toString = {
+			new RealJSONBlock(m.toList.map {case (k,v) => (if (k.isInstanceOf[String]) k.toString else jsonize(k), v)}).toString
+		}
+	}
 
     def $(all: (String, Any)*) = new RealJSONBlock(List(all: _*))
     def %(all: Any*) = new JSONArray(List(all: _*))
@@ -62,6 +68,7 @@ package object jsonr {
         
         def toJSON: JSONBlock = {
             if (isABasicScalaType(a)) new FakeJSONBlock(a)
+			else if (a.isInstanceOf[scala.collection.Map[_,_]]) new JSONMap(a.asInstanceOf[scala.collection.Map[_,_]])
             else if (a.isInstanceOf[Iterable[_]]) new JSONArray(a.asInstanceOf[Iterable[_]].toList)
             else classJSON
         }
