@@ -148,4 +148,13 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 		json should be === """{"theMap": {"a": "b"}}"""
 	}
 	
+	it should "convert tuples to lists" in {
+		val json = $(
+            "tuple2" -> (1, "oi"),
+			"tuple3" -> (3.2, "a", 0)
+        ).toString
+		
+		json should be === """{"tuple2": [1, "oi"], "tuple3": [3.2, "a", 0]}"""
+	}
+	
 }

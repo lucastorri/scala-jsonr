@@ -23,19 +23,22 @@ package object jsonr {
             else None
         }
     }
+	
+	private type TupleType = { def productIterator: Iterator[Any] }
     
     private def jsonize(a: Any): String = a match {
-		case None				  => "\"\""
-		case s: Some[_]           => any2jsonable(s.get).toJSON.toString
-        case s: String            			=> format("\"%s\"", s)
-        case s: Symbol            			=> format("\"%s\"", s.toString)
-        case u: Unit              			=> ""
-		case m: scala.collection.Map[_, _]	=> new JSONMap(m).toString
-        case i: Iterable[_]       => new JSONArray(i.toList).toString
-        case null                 => "\"null\""
-        case IsABasicScalaType(a) => a.toString
-        case b: JSONBlock         => b.toString
-        case _                    => any2jsonable(a).toJSON.toString
+		case None				                                                => "\"\""
+		case s: Some[_]                                                         => any2jsonable(s.get).toJSON.toString
+        case s: String            			                                    => "\"%s\"".format(s)
+        case s: Symbol            			                                    => "\"%s\"".format(s.toString)
+        case u: Unit              			                                    => ""
+		case m: scala.collection.Map[_, _]	                                    => new JSONMap(m).toString
+        case i: Iterable[_]       					                            => new JSONArray(i.toList).toString
+        case null                                                               => "\"null\""
+        case IsABasicScalaType(a)                                               => a.toString
+        case b: JSONBlock         												=> b.toString
+		case t: TupleType if t.getClass.getName.matches(".*scala.Tuple\\d+")	=> new JSONArray(t.productIterator.toList).toString
+        case _                    												=> any2jsonable(a).toJSON.toString
     }
 
     trait JSONBlock
@@ -45,7 +48,7 @@ package object jsonr {
     class RealJSONBlock(inner: List[(String, Any)]) extends JSONBlock {
         override def toString = {
             "{" + inner.map { case (k,v) =>
-                format(""""%s": %s""", k, jsonize(v))
+                """"%s": %s""".format(k, jsonize(v))
             }.mkString(", ") + "}"
         }
     }
