@@ -47,8 +47,8 @@ package object jsonr {
     }
 
     case class StringElement(s: String) extends JSONElement {
-        private def escape(s: String) = s
-        protected def construct(b: StringBuilder) = b.append("\"").append(escape(s)).append("\"")
+        private def escaped = s
+        protected def construct(b: StringBuilder) = b.append("\"").append(escaped).append("\"")
     }
 
     case class PrimitiveElement[ElementType](e: ElementType) extends JSONElement {
@@ -61,36 +61,28 @@ package object jsonr {
     
     abstract class SequenceElement(begin: String, end: String) extends JSONElement {
         def elements: Iterable[JSONElement]
-        protected def construct(b: StringBuilder) = {
-            var allE = elements
-            b.append(begin)
-            allE.headOption.map { h =>
-                allE.tail.foldLeft(b.append(h)) { case (b, e) =>
+        protected def construct(b: StringBuilder) =
+            Some(b.append(begin)).flatMap(_ => elements.headOption).map { h =>
+                elements.tail.foldLeft(b.append(h)) { case (b, e) =>
                     b.append(", ").append(e)
                 }
-            }
-            b.append(end)
-        }
+            }.getOrElse(b).append(end)
     }
     
     case class ArrayElement[IterableType](i: Iterable[IterableType]) extends SequenceElement("[", "]") {
-        def elements = i.map(JSONElement.apply)
+        lazy val elements = i.map(JSONElement.apply)
     }
 
     case class MapElement(m: IMap[_,_]) extends SequenceElement("{", "}") {
-        def elements = m.map(JSONElement.apply).toList
+        lazy val elements = m.map(JSONElement.apply).toList
     }
     
     case class ObjectElement[ClassType](o: ClassType) extends SequenceElement("{", "}") {
-        def elements = {
-            val c = o.getClass
-            c.getDeclaredFields.view.filterNot(_.getName.contains("$")).filter { f =>
-                try Option(c.getDeclaredMethod(f.getName)).map(_ => true).getOrElse(false)
-                catch { case _ => false }
-            }.map { f =>
-                JSONElement(f.getName, c.getDeclaredMethod(f.getName).invoke(o))
-            }
-        }
+        lazy val elements =
+            o.getClass.getDeclaredFields.filterNot(_.getName.contains("$")).flatMap { f =>
+                try Option(o.getClass.getDeclaredMethod(f.getName)).map(m => JSONElement(f.getName, m.invoke(o)))
+                catch { case _ => None }
+            }.toList
     }
     
     
