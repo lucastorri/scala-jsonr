@@ -87,9 +87,8 @@ package object jsonr {
     
     
     implicit def any2json(a: Any) = JSONElement(a)
-	
 
     def $(all: (String, Any)*) = MapElement(all.toMap)
     def %(all: Any*) = new ArrayElement(all)
-	
+
 }
