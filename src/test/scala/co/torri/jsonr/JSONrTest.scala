@@ -1,12 +1,12 @@
-package co.torri.jsonr
+package co.torri.jsonr.test
 
 import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 import co.torri.jsonr._
 
-class JSONrTest extends FlatSpec with ShouldMatchers {
+class jsonrTest extends FlatSpec with ShouldMatchers {
     
-    behavior of "JSONr"
+    behavior of "jsonr"
 
     it should "create a JSON String from Strings" in {
         val json = $(
@@ -81,19 +81,19 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
     case class Something(val param1: String, val param2: Int)
     case class SomethingElse(val arg1: Something, val arg2: Int)
     
-    it should "enable any class to call the toJSON method" in {
-        val json = Something("hello", 7).toJSON.toString
+    it should "enable any class to call the toJson method" in {
+        val json = Something("hello", 7).toJson.toString
         json should be === """{"param1": "hello", "param2": 7}"""
     }
     
-    it should "allow nested objects in toJSON calls" in {
-        val json = SomethingElse(Something("a", 1), 2).toJSON.toString
+    it should "allow nested objects in toJson calls" in {
+        val json = SomethingElse(Something("a", 1), 2).toJson.toString
         json should be === """{"arg1": {"param1": "a", "param2": 1}, "arg2": 2}"""
     }
     
-    it should "allow nested null objects in toJSON" in {
-        val json = SomethingElse(null, 2).toJSON.toString
-        json should be === """{"arg1": "null", "arg2": 2}"""
+    it should "allow nested null objects in toJson" in {
+        val json = SomethingElse(null, 2).toJson.toString
+        json should be === """{"arg1": null, "arg2": 2}"""
     }
     
     it should "create groups for lists of classes other than basic types" in {
@@ -107,7 +107,7 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
     case class ObjWithList(val i: Int, val l: List[Int])
 
     it should "handle Iterable objects inside other objects" in {
-      val json = ObjWithList(3, List(1,2,3)).toJSON.toString
+      val json = ObjWithList(3, List(1,2,3)).toJson.toString
 
       json should be === """{"i": 3, "l": [1, 2, 3]}"""
     }
@@ -129,13 +129,13 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 	}
 	
 	it should "convert maps to objects" in {
-		val json = Map("one" -> 1, "two" -> 2).toJSON.toString
+		val json = Map("one" -> 1, "two" -> 2).toJson.toString
 		
 		json should be === """{"one": 1, "two": 2}"""
 	}
 	
 	it should "convert other type of maps to objects" in {
-		val json = scala.collection.mutable.HashMap("two" -> 2).toJSON.toString
+		val json = scala.collection.mutable.HashMap("two" -> 2).toJson.toString
 		
 		json should be === """{"two": 2}"""
 	}
@@ -143,18 +143,38 @@ class JSONrTest extends FlatSpec with ShouldMatchers {
 	case class ObjWithMap(theMap: Map[String, String])
 	
 	it should "convert inner maps to objects" in {
-		val json = ObjWithMap(Map("a" -> "b")).toJSON.toString
+		val json = ObjWithMap(Map("a" -> "b")).toJson.toString
 		
 		json should be === """{"theMap": {"a": "b"}}"""
 	}
 	
-	it should "convert tuples to lists" in {
+	it should "get the element of size 1 tuples" in {
 		val json = $(
-            "tuple2" -> (1, "oi"),
-			"tuple3" -> (3.2, "a", 0)
+            "tuple1" -> Tuple1(1)
         ).toString
 		
-		json should be === """{"tuple2": [1, "oi"], "tuple3": [3.2, "a", 0]}"""
+		json should be === """{"tuple1": 1}"""
+		
 	}
+	
+	it should "convert tuples of size 3+ to lists" in {
+		val json = $(
+			"tuple3" -> (3.2, "a", 0),
+			"tuple4" -> (1, null, 0, "oi")
+        ).toString
+		
+		json should be === """{"tuple3": [3.2, "a", 0], "tuple4": [1, null, 0, "oi"]}"""
+	}
+	
+/*
+	it should "escape characters" in {
+		val json = $(
+            "q" -> "\""
+			"b" -> "\\"
+        ).toString
+		
+		json should be === """{"q": "\"", "b": "\\"}"""
+	}
+*/	
 	
 }

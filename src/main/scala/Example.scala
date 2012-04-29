@@ -1,6 +1,7 @@
 import co.torri.jsonr._
 
 object Example {
+
     def main(args: Array[String]) = {
         
         var json = $(
@@ -37,7 +38,6 @@ object Example {
         )
         
         println(other)
-        
     }
 }
 
