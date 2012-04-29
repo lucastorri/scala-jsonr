@@ -34,7 +34,7 @@ package object jsonr {
             case t: Tuple2[_,_] => PairElement(t)
             case TupleType(t)   => ArrayElement(t)
             case e: JSONElement => e
-            case o              => ClassElement(o)
+            case o              => ObjectElement(o)
         }
     }
     
@@ -81,7 +81,7 @@ package object jsonr {
         def elements = m.map(JSONElement.apply).toList
     }
     
-    case class ClassElement[ClassType](o: ClassType) extends SequenceElement("{", "}") {
+    case class ObjectElement[ClassType](o: ClassType) extends SequenceElement("{", "}") {
         def elements = {
             val c = o.getClass
             c.getDeclaredFields.view.filterNot(_.getName.contains("$")).filter { f =>
@@ -94,7 +94,7 @@ package object jsonr {
     }
     
     
-    implicit def any2json(a: Any) = JSONElement(a.asInstanceOf[AnyRef])
+    implicit def any2json(a: Any) = JSONElement(a)
 	
 
     def $(all: (String, Any)*) = MapElement(all.toMap)

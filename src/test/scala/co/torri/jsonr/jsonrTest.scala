@@ -154,7 +154,6 @@ class jsonrTest extends FlatSpec with ShouldMatchers {
         ).toString
 		
 		json should be === """{"tuple1": 1}"""
-		
 	}
 	
 	it should "convert tuples of size 3+ to lists" in {
