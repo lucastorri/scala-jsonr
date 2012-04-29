@@ -20,20 +20,20 @@ package object jsonr {
     
     object JSONElement {
         def apply(a: Any) : JSONElement = a match {
+            case e: JSONElement => e
             case null           => nullElement
             case None           => emptyElement
             case n: Unit        => emptyElement
-            case Some(s)        => JSONElement(s)
             case n: Number      => PrimitiveElement(n)
             case b: Boolean     => PrimitiveElement(b)
             case c: Char        => PrimitiveElement(c)
             case s: String      => StringElement(s)
-            case m: IMap[_, _]  => MapElement(m)
-            case i: Iterable[_] => ArrayElement(i.toList)
+            case Some(s)        => JSONElement(s)
             case Tuple1(e)      => JSONElement(e)
             case t: Tuple2[_,_] => PairElement(t)
+            case m: IMap[_, _]  => MapElement(m)
+            case i: Iterable[_] => ArrayElement(i)
             case TupleType(t)   => ArrayElement(t)
-            case e: JSONElement => e
             case o              => ObjectElement(o)
         }
     }
