@@ -16,6 +16,8 @@ package object jsonr {
         protected def construct(b: StringBuilder) : StringBuilder
         override def toString = construct(new StringBuilder).toString
         def toJson = this
+        def element: Any
+        def as[Type] = element.asInstanceOf[Type]
     }
     
     object JSONElement {
@@ -39,24 +41,23 @@ package object jsonr {
     }
     
     object nullElement extends JSONElement {
+        val element = null
         protected def construct(b: StringBuilder) = b.append("null")
     }
     
-    object emptyElement extends JSONElement {
-        protected def construct(b: StringBuilder) = b.append("\"\"")
-    }
+    object emptyElement extends StringElement("")
 
-    case class StringElement(s: String) extends JSONElement {
-        private def escaped = s
+    case class StringElement(element: String) extends JSONElement {
+        private def escaped = element
         protected def construct(b: StringBuilder) = b.append("\"").append(escaped).append("\"")
     }
 
-    case class PrimitiveElement[ElementType](e: ElementType) extends JSONElement {
-        protected def construct(b: StringBuilder) = b.append(e.toString)
+    case class PrimitiveElement[ElementType](element: ElementType) extends JSONElement {
+        protected def construct(b: StringBuilder) = b.append(element.toString)
     }
     
-    case class PairElement[Key,Value](p: (Key, Value)) extends JSONElement {
-        protected def construct(b: StringBuilder) = b.append(JSONElement(p._1)).append(": ").append(JSONElement(p._2))
+    case class PairElement[Key,Value](element: (Key, Value)) extends JSONElement {
+        protected def construct(b: StringBuilder) = b.append(JSONElement(element._1)).append(": ").append(JSONElement(element._2))
     }
     
     abstract class SequenceElement(begin: String, end: String) extends JSONElement {
@@ -69,18 +70,18 @@ package object jsonr {
             }.getOrElse(b).append(end)
     }
     
-    case class ArrayElement[IterableType](i: Iterable[IterableType]) extends SequenceElement("[", "]") {
-        lazy val elements = i.map(JSONElement.apply)
+    case class ArrayElement[IterableType](element: Iterable[IterableType]) extends SequenceElement("[", "]") {
+        lazy val elements = element.map(JSONElement.apply)
     }
 
-    case class MapElement(m: IMap[_,_]) extends SequenceElement("{", "}") {
-        lazy val elements = m.map(JSONElement.apply).toList
+    case class MapElement(element: IMap[_,_]) extends SequenceElement("{", "}") {
+        lazy val elements = element.map(JSONElement.apply).toList
     }
     
-    case class ObjectElement[ClassType](o: ClassType) extends SequenceElement("{", "}") {
+    case class ObjectElement[ClassType](element: ClassType) extends SequenceElement("{", "}") {
         lazy val elements =
-            o.getClass.getDeclaredFields.filterNot(_.getName.contains("$")).flatMap { f =>
-                try Option(o.getClass.getDeclaredMethod(f.getName)).map(m => JSONElement(f.getName, m.invoke(o)))
+            element.getClass.getDeclaredFields.filterNot(_.getName.contains("$")).flatMap { f =>
+                try Option(element.getClass.getDeclaredMethod(f.getName)).map(m => JSONElement(f.getName, m.invoke(element)))
                 catch { case _ => None }
             }.toList
     }
