@@ -165,15 +165,10 @@ class jsonrTest extends FlatSpec with ShouldMatchers {
 		json should be === """{"tuple3": [3.2, "a", 0], "tuple4": [1, null, 0, "oi"]}"""
 	}
 	
-/*
 	it should "escape characters" in {
-		val json = $(
-            "q" -> "\""
-			"b" -> "\\"
-        ).toString
+		val json = %("\"", "\\", "\b", "\n", "\r", "\t").toString
 		
-		json should be === """{"q": "\"", "b": "\\"}"""
+		json should be === """["\"", "\\", "\b", "\n", "\r", "\t"]"""
 	}
-*/	
 	
 }

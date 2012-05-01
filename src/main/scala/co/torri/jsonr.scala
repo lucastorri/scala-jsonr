@@ -48,7 +48,16 @@ package object jsonr {
     object emptyElement extends StringElement("")
 
     case class StringElement(element: String) extends JSONElement {
-        private def escaped = element
+        lazy val escaped = element.map {
+			case '\"' => "\\\""
+			case '\\' => "\\\\"
+            case '\b' => "\\b"
+            case '\f' => "\\f"
+            case '\n' => "\\n"
+            case '\r' => "\\r"
+            case '\t' => "\\t"
+			case c => c
+			}.mkString
         protected def construct(b: StringBuilder) = b.append("\"").append(escaped).append("\"")
     }
 
