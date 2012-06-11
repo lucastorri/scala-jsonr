@@ -31,3 +31,23 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 seq(assemblySettings: _*)
+
+pomExtra := (
+  <licenses>
+    <license>
+      <name>MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+    </license>
+  </licenses>
+  <scm>
+    <url>git://github.com/lucastorri/scala-jsonr.git</url>
+    <connection>scm:git:git://github.com/lucastorri/scala-jsonr.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>lucastorri</id>
+      <name>Lucas Torri</name>
+      <url>http://latestbuild.net/</url>
+    </developer>
+  </developers>
+)
