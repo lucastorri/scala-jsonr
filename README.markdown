@@ -31,6 +31,7 @@ In this form JSON objects are described using the special method `$`. It receive
       "array" -> List(1, 2, 3),
       "more"  -> List($("foo" -> "bar"))
     )
+    
     println(json)
     // {"key": "value", "int": 2, "array": [1, 2, 3], "more": [{"foo": "bar"}]}
 
@@ -42,11 +43,13 @@ Any existent object can be automatically converted to JSON using the special met
     case class Address(city: String, country: String)
     case class Person(name: String, val age: Int, address: Address)
     val json = Person("Lucas", 25, Address("Porto Alegre", "BR")).toJson
+    
     println(json)
     // {"name": "Lucas", "age": 25, "address": {"city": "Porto Alegre", "country": "BR"}}
 
 The same apply for Maps:
 
     val json = Map("one" -> 1, "two" -> 2).toJson
+    
     println(json)
     // {"one": 1, "two": 2}
